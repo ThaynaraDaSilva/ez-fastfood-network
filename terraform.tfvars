@@ -7,18 +7,18 @@ project                = "ez-fastfood"
 public_subnets = {
   "subnet1" = {
     cidr_block               = "10.0.1.0/24"
-    availability_zone_suffix = "e"
+    availability_zone_suffix = "a"
   },
   "subnet2" = {
     cidr_block               = "10.0.2.0/24"
-    availability_zone_suffix = "a"
+    availability_zone_suffix = "b"
   }
 }
 
 private_subnets = {
   "subnet1" = {
     cidr_block               = "10.0.3.0/24"
-    availability_zone_suffix = "b"
+    availability_zone_suffix = "e"
   }
 }
 

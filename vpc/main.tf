@@ -22,7 +22,7 @@ resource "aws_subnet" "public_subnets" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name        = "${var.project}-public-subnet-${each.key}"
+    Name        = "${var.project}-public-${each.key}"
     Environment = var.environment
     Project     = var.project
   }
@@ -38,7 +38,7 @@ resource "aws_subnet" "private_subnets" {
   map_public_ip_on_launch = false
 
   tags = {
-    Name        = "${var.project}-private-subnet-${each.key}"
+    Name        = "${var.project}-private-${each.key}"
     Environment = var.environment
     Project     = var.project
   }
