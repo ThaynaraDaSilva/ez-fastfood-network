@@ -8,8 +8,8 @@ on:
     #branches:
       #- main
 env:
-    TF_VAR_aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    TF_VAR_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    TF_VAR_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 jobs:
   # 1. Lint and Validate
   lint-validate:
