@@ -31,7 +31,7 @@ jobs:
 
       - name: Terraform Plan (VPC)
         working-directory: ./vpc
-        run: terraform plan -out=tfplan
+        run: terraform plan -var-file="../../terraform.tfvars"
 
       - name: Terraform Apply (VPC)
         working-directory: ./vpc
@@ -57,7 +57,7 @@ jobs:
 
       - name: Terraform Plan (IGW)
         working-directory: ./internet_gateway
-        run: terraform plan -out=tfplan
+        run: terraform plan -var-file="../../terraform.tfvars"
 
       - name: Terraform Apply (IGW)
         working-directory: ./internet_gateway
@@ -83,7 +83,7 @@ jobs:
 
       - name: Terraform Plan (SG)
         working-directory: ./security_group
-        run: terraform plan -out=tfplan
+        run: terraform plan -var-file="../../terraform.tfvars"
 
       - name: Terraform Apply (SG)
         working-directory: ./security_group
