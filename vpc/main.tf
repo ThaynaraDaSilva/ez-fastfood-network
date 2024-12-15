@@ -49,7 +49,7 @@ resource "aws_route_table" "public" {
   vpc_id = aws_vpc.ez_fastfood_vpc.id
 
   tags = {
-    Name        = "${var.project}-public-route-table"
+    Name        = "${var.project}-public-route-table-${var.environment}"
     Environment = var.environment
     Project     = var.project
   }
@@ -60,7 +60,7 @@ resource "aws_route_table" "private" {
   vpc_id = aws_vpc.ez_fastfood_vpc.id
 
   tags = {
-    Name        = "${var.project}-private-route-table"
+    Name        = "${var.project}-private-route-table-${var.environment}"
     Environment = var.environment
     Project     = var.project
   }
