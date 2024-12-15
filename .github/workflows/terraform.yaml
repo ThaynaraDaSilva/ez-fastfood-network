@@ -29,6 +29,10 @@ jobs:
         working-directory: ./vpc
         run: terraform init
 
+      - name: Terraform Console (VPC)
+        working-directory: ./vpc
+        run: terraform console
+
       - name: Terraform Plan (VPC)
         working-directory: ./vpc
         #run: terraform plan -out=tfplan
