@@ -33,10 +33,10 @@ jobs:
         working-directory: ./vpc
         run: terraform console
 
-      - name: Terraform Plan (VPC)
-        working-directory: ./vpc
-        #run: terraform plan -out=tfplan
-        run: terraform plan -var-file="../terraform.tfvars" -out=tfplan
+      # - name: Terraform Plan (VPC)
+      #   working-directory: ./vpc
+      #   #run: terraform plan -out=tfplan
+      #   run: terraform plan -var-file="../terraform.tfvars" -out=tfplan
 
       - name: Terraform Apply (VPC)
         working-directory: ./vpc
