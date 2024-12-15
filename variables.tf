@@ -42,23 +42,28 @@ variable "allowed_ips" {
 }
 
 variable "ingress_rules" {
-  description = "Lista de regras de entrada (ingress) para o Security Group"
+  description = "Regras dinâmicas de ingress para o Security Group"
   type = list(object({
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
+    description     = optional(string)
+    from_port       = number
+    to_port         = number
+    protocol        = string
+    cidr_blocks     = optional(list(string))
+    security_groups = optional(list(string))
   }))
+  default = []
 }
 
 variable "egress_rules" {
-  description = "Lista de regras de saída (egress) para o Security Group"
+  description = "Regras dinâmicas de egress para o Security Group"
   type = list(object({
+    description = optional(string)
     from_port   = number
     to_port     = number
     protocol    = string
     cidr_blocks = list(string)
   }))
+  default = []
 }
 
 

@@ -21,6 +21,7 @@ module "security_group" {
   egress_rules  = var.egress_rules
   project       = var.project
   environment   = var.environment
+  
 }
 
 # Módulo Internet Gateway

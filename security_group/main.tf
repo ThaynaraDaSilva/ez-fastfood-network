@@ -1,9 +1,12 @@
 # main.tf
+
 # Criar Security Group dinâmico
 resource "aws_security_group" "rds_sg" {
   name        = "${var.project}-rds-sg-${var.environment}"
-  description = "Allow dynamic inbound and outbound rules for ${var.project}"
+  description = "${var.project} rds sg"
   vpc_id      = var.vpc_id
+
+
 
   # Regras de ingress dinâmicas
   dynamic "ingress" {

@@ -31,13 +31,14 @@ ingress_rules = [
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["177.190.77.68/32"] # Substitua pelo seu IP
+    cidr_blocks = ["177.190.77.161/32"] # Substitua pelo seu IP
+    security_groups = []
   },
   {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Exemplo para HTTP
+    cidr_blocks = [] # Exemplo para HTTP
   }
 ]
 

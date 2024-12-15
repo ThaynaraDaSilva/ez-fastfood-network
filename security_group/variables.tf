@@ -4,18 +4,20 @@ variable "vpc_id" {
 }
 
 variable "ingress_rules" {
-  description = "Lista de regras de entrada (ingress) para o Security Group"
+  description = "Regras dinâmicas de ingress para o Security Group"
   type = list(object({
-    from_port   = number
-    to_port     = number
-    protocol    = string
-    cidr_blocks = list(string)
+    description     = string
+    from_port       = number
+    to_port         = number
+    protocol        = string
+    cidr_blocks     = optional(list(string))  # Opcional: para IPs específicos
   }))
 }
 
 variable "egress_rules" {
-  description = "Lista de regras de saída (egress) para o Security Group"
+  description = "Regras dinâmicas de egress para o Security Group"
   type = list(object({
+    description = string
     from_port   = number
     to_port     = number
     protocol    = string
