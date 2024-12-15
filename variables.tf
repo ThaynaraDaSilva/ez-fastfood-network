@@ -2,6 +2,23 @@ variable "region" {
   default = "us-east-1"
 }
 
+variable "access_key" {
+  description = "AWS Access Key"
+  type        = string
+}
+
+variable "secret_key" {
+  description = "AWS Secret Key"
+  type        = string
+}
+
+variable "project" {
+  description = "Project name for tagging"
+  type        = string
+  default     = "ez-fastfood"
+}
+
+
 variable "cidr_block" {
   default = "10.0.0.0/16"
 }

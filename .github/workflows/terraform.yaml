@@ -1,1 +1,131 @@
+name: "Terraform Pipeline"
 
+on:
+  push:
+    branches:
+      - main
+  #pull_request:
+    #branches:
+      #- main
+env:
+    TF_VAR_aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    TF_VAR_aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+jobs:
+  # 1. Lint and Validate
+  lint-validate:
+    name: "Lint and Validate Terraform"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform Format
+        run: terraform fmt -recursive -check
+
+      - name: Terraform Validate
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+  # 2. VPC Module
+  vpc:
+    name: "VPC Module"
+    needs: lint-validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform Init (VPC)
+        working-directory: ./vpc
+        run: terraform init
+
+      - name: Terraform Plan (VPC)
+        working-directory: ./vpc
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply (VPC)
+        working-directory: ./vpc
+        run: terraform apply -auto-approve tfplan
+
+  # 3. Internet Gateway Module
+  internet-gateway:
+    name: "Internet Gateway Module"
+    needs: vpc  # Wait for VPC job to complete
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform Init (IGW)
+        working-directory: ./internet_gateway
+        run: terraform init
+
+      - name: Terraform Plan (IGW)
+        working-directory: ./internet_gateway
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply (IGW)
+        working-directory: ./internet_gateway
+        run: terraform apply -auto-approve tfplan
+
+  # 4. Security Group Module
+  security-group:
+    name: "Security Group Module"
+    needs: vpc  # Wait for VPC job to complete
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Terraform Init (SG)
+        working-directory: ./security_group
+        run: terraform init
+
+      - name: Terraform Plan (SG)
+        working-directory: ./security_group
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply (SG)
+        working-directory: ./security_group
+        run: terraform apply -auto-approve tfplan
+
+  # 5. Final Outputs
+  outputs:
+    name: "Collect Outputs"
+    needs: [vpc, internet-gateway, security-group]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.6.0"
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Terraform Output
+        run: terraform output
