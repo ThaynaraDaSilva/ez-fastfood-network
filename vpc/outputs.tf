@@ -1,6 +1,6 @@
 output "vpc_id" {
   description = "ID da VPC criada"
-  value       = aws_vpc.ez_fastfood_vpc.id
+  value       = aws_vpc.ez_fastfood_vpc[0].id
 }
 
 output "public_subnet_ids" {
@@ -15,10 +15,10 @@ output "private_subnet_ids" {
 
 output "public_route_table_id" {
   description = "ID da Route Table pública"
-  value       = aws_route_table.public.id
+  value       = aws_route_table.public["public"].id
 }
 
 output "private_route_table_id" {
   description = "ID da Route Table privada"
-  value       = aws_route_table.private.id
+  value       = aws_route_table.private["private"].id
 }
