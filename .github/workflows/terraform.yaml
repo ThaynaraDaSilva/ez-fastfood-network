@@ -88,31 +88,31 @@ jobs:
         run: terraform apply -auto-approve ${{ env.PLAN_SG }}
 
   # Cleanup on Failure
-  cleanup:
-    name: "Terraform Destroy on Failure"
-    if: failure()  # Executa apenas se algum job falhar
-    needs: [vpc, internet-gateway, security-group]
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+  # cleanup:
+  #   name: "Terraform Destroy on Failure"
+  #   if: failure()  # Executa apenas se algum job falhar
+  #   needs: [vpc, internet-gateway, security-group]
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 10
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
 
-      # Baixar todos os artefatos de uma só vez
-      - name: Download All Terraform Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: "*"
-          path: .
+  #     # Baixar todos os artefatos de uma só vez
+  #     - name: Download All Terraform Artifacts
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: "*"
+  #         path: .
 
-      # Destruir recursos relacionados aos Security Groups
-      - name: Terraform Destroy Security Group
-        run: cd artifacts-sg && terraform destroy -auto-approve -target=module.security_group
+  #     # Destruir recursos relacionados aos Security Groups
+  #     - name: Terraform Destroy Security Group
+  #       run: cd artifacts-sg && terraform destroy -auto-approve -target=module.security_group
 
-      # Destruir recursos relacionados ao Internet Gateway
-      - name: Terraform Destroy Internet Gateway
-        run: cd artifacts-igw && terraform destroy -auto-approve -target=module.internet_gateway
+  #     # Destruir recursos relacionados ao Internet Gateway
+  #     - name: Terraform Destroy Internet Gateway
+  #       run: cd artifacts-igw && terraform destroy -auto-approve -target=module.internet_gateway
 
-      # Destruir a VPC
-      - name: Terraform Destroy VPC
-        run: cd artifacts-vpc && terraform destroy -auto-approve -target=module.vpc
+  #     # Destruir a VPC
+  #     - name: Terraform Destroy VPC
+  #       run: cd artifacts-vpc && terraform destroy -auto-approve -target=module.vpc

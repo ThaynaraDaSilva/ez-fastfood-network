@@ -9,9 +9,17 @@ data "aws_vpc" "selected" {
 
 }
 
-# Buscar as subnets públicas associadas à VPC
+# Buscar IDs das subnets públicas associadas à VPC
 data "aws_subnet" "public_subnets" {
-  vpc_id = data.aws_vpc.selected.id
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.selected.id]
+  }
+
+  filter {
+    name   = "tag:Type"
+    values = ["public"]
+  }
 }
 
 data "aws_subnet" "public_subnets_detail" {
