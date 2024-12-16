@@ -20,8 +20,8 @@ Os recursos foram organizados em módulos Terraform, com os seguintes componente
 - **ez-fastfood-igw-dev**: internet gateway para permitir a conexão da VPC com a internet.
 
 ### Pré-requisitos (execução via pipeline)
-**1. Terraform**
-**2. Credenciais AWS**: Configure as credenciais AWS para permitir o provisionamento de recursos.  
+1. **Terraform**
+2. **Credenciais AWS**: Configure as credenciais AWS para permitir o provisionamento de recursos.  
 
 No pipeline configurado no GitHub Actions, as credenciais foram armazenadas como **secret variables** para evitar exposição direta no código:  
   - **AWS_ACCESS_KEY_ID**  
