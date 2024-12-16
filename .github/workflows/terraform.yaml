@@ -16,30 +16,39 @@ env:
   PLAN_SG: "tfplan-sg"
 
 jobs:
-  # 1. Initialize Terraform (Global)
-  initialize:
-    name: "Initialize Terraform"
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+  # # 1. Initialize Terraform (Global)
+  # initialize:
+  #   name: "Initialize Terraform"
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v3
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: "1.6.0"
+  #     - name: Set up Terraform
+  #       uses: hashicorp/setup-terraform@v2
+  #       with:
+  #         terraform_version: "1.6.0"
 
-      - name: Terraform Init (Global)
-        run: terraform init
+  #     - name: Terraform Init (Global)
+  #       run: terraform init
+
+  #     - name: Save Terraform Init State
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: terraform-init
+  #         path: .terraform
 
   # 2. VPC Module
   vpc:
     name: "VPC Module"
-    needs: initialize  # Dependência do job de inicialização
+    #needs: initialize  # Dependência do job de inicialização
     runs-on: ubuntu-latest
     steps:
       #- name: Checkout Code
       #  uses: actions/checkout@v3
+
+      - name: Terraform Init (VPC)
+        run: terraform init
 
       - name: Terraform Plan (VPC)
         run: terraform plan -target=module.vpc -out=${{ env.PLAN_VPC }}
@@ -56,6 +65,9 @@ jobs:
       #- name: Checkout Code
       #  uses: actions/checkout@v3
 
+      - name: Terraform Init (IGW)
+        run: terraform init
+
       - name: Terraform Plan (IGW)
         run: terraform plan -target=module.internet_gateway -out=${{ env.PLAN_IGW }}
 
@@ -70,6 +82,9 @@ jobs:
     steps:
       #- name: Checkout Code
       #  uses: actions/checkout@v3
+
+      - name: Terraform Init (SG)
+        run: terraform init
 
       - name: Terraform Plan (SG)
         run: terraform plan -target=module.security_group -out=${{ env.PLAN_SG }}
