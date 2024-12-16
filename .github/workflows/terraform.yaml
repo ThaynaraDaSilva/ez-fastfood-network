@@ -40,7 +40,7 @@ jobs:
 
       - name: Terraform Apply (VPC)
         working-directory: ./vpc
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -target=module.vpc -auto-approve tfplan
 
   # 2. Internet Gateway Module
   internet-gateway:

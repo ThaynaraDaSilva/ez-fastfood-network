@@ -31,9 +31,6 @@ variable "environment" {
   default = "dev"
 }
 
-variable "project" {
-  default = "ez-fastfood"
-}
 
 variable "vpc_name" {
   default = "ez-fastfood-dev-vpc"
