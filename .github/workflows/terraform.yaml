@@ -9,15 +9,19 @@ on:
 env:
   TF_VAR_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
   TF_VAR_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #TF_CLI_ARGS: "-var-file=${{ github.workspace }}/terraform.tfvars"
+
+  # Nomes dos arquivos de plano
+  PLAN_VPC: "tfplan-vpc"
+  PLAN_IGW: "tfplan-igw"
+  PLAN_SG: "tfplan-sg"
 
 jobs:
-  # 1. VPC Module
-  vpc:
-    name: "VPC Module"
+  # 1. Initialize Terraform (Global)
+  initialize:
+    name: "Initialize Terraform"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Set up Terraform
@@ -25,125 +29,74 @@ jobs:
         with:
           terraform_version: "1.6.0"
 
-      - name: Terraform Init (VPC)
-        #working-directory: ./vpc
+      - name: Terraform Init (Global)
         run: terraform init
 
-      # - name: Terraform Console (VPC)
-      #   working-directory: ./vpc
-      #   run: terraform console
+  # 2. VPC Module
+  vpc:
+    name: "VPC Module"
+    needs: initialize  # Dependência do job de inicialização
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Terraform Plan (VPC)
-        #working-directory: ./vpc
-        #run: terraform plan -out=tfplan
-        run: terraform plan -target=module.vpc -out=tfplan
+        run: terraform plan -target=module.vpc -out=${{ env.PLAN_VPC }}
 
       - name: Terraform Apply (VPC)
-        working-directory: ./vpc
-        run: terraform apply -target=module.vpc -auto-approve tfplan
+        run: terraform apply -auto-approve ${{ env.PLAN_VPC }}
 
-  # 2. Internet Gateway Module
+  # 3. Internet Gateway Module
   internet-gateway:
     name: "Internet Gateway Module"
     needs: vpc
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: "1.6.0"
-
-      - name: Terraform Init (IGW)
-        working-directory: ./internet_gateway
-        run: terraform init
-
       - name: Terraform Plan (IGW)
-        working-directory: ./internet_gateway
-        run: terraform plan -var-file="../terraform.tfvars" -out=tfplan
-        #run: terraform plan -out=tfplan
+        run: terraform plan -target=module.internet_gateway -out=${{ env.PLAN_IGW }}
 
       - name: Terraform Apply (IGW)
-        working-directory: ./internet_gateway
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve ${{ env.PLAN_IGW }}
 
-  # 3. Security Group Module
+  # 4. Security Group Module
   security-group:
     name: "Security Group Module"
     needs: vpc
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: "1.6.0"
-
-      - name: Terraform Init (SG)
-        working-directory: ./security_group
-        run: terraform init
-
       - name: Terraform Plan (SG)
-        working-directory: ./security_group
-        run: terraform plan -var-file="../terraform.tfvars" -out=tfplan
-        #run: terraform plan -out=tfplan
+        run: terraform plan -target=module.security_group -out=${{ env.PLAN_SG }}
 
       - name: Terraform Apply (SG)
-        working-directory: ./security_group
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve ${{ env.PLAN_SG }}
 
-  # 4. Final Outputs
+  # 5. Final Outputs
   outputs:
     name: "Collect Outputs"
     needs: [vpc, internet-gateway, security-group]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: "1.6.0"
-
-      - name: Initialize Terraform
-        run: terraform init
 
       - name: Terraform Output
         run: terraform output
 
-  # 5. Cleanup Job in case of failure
+  # 6. Cleanup Job in case of failure
   cleanup:
     name: "Terraform Destroy on Failure"
     if: failure()  # Executa apenas se algum job falhar
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: "1.6.0"
-
-      - name: Terraform Destroy VPC
-        working-directory: ./vpc
-        run: |
-          terraform init
-          terraform destroy -auto-approve
-
-      - name: Terraform Destroy Internet Gateway
-        working-directory: ./internet_gateway
-        run: |
-          terraform init
-          terraform destroy -auto-approve
-
-      - name: Terraform Destroy Security Group
-        working-directory: ./security_group
-        run: |
-          terraform init
-          terraform destroy -auto-approve
+      - name: Terraform Destroy All
+        run: terraform destroy -auto-approve
