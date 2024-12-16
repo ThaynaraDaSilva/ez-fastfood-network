@@ -23,11 +23,10 @@ resource "aws_vpc" "ez_fastfood_vpc" {
 }
 # Criar Subnets
 resource "aws_subnet" "public_subnets" {
-  count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
-  
-  for_each = var.public_subnets
-
-  vpc_id                  = aws_vpc.ez_fastfood_vpc.id
+  #count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
+  #for_each = var.public_subnets
+  for_each = length(aws_vpc.ez_fastfood_vpc) > 0 ? var.public_subnets : {}
+  vpc_id                  = aws_vpc.ez_fastfood_vpc[0].id
   cidr_block              = each.value.cidr_block
   availability_zone       = "${var.region}${each.value.availability_zone_suffix}"
   map_public_ip_on_launch = true
@@ -41,10 +40,9 @@ resource "aws_subnet" "public_subnets" {
 
 # Subnets Privadas
 resource "aws_subnet" "private_subnets" {
-  count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
-  for_each = var.private_subnets
-
-  vpc_id                  = aws_vpc.ez_fastfood_vpc.id
+  #for_each = var.private_subnets
+  for_each = length(aws_vpc.ez_fastfood_vpc) > 0 ? var.private_subnets : {}
+  vpc_id                  = aws_vpc.ez_fastfood_vpc[0].id
   cidr_block              = each.value.cidr_block
   availability_zone       = "${var.region}${each.value.availability_zone_suffix}"
   map_public_ip_on_launch = false
@@ -58,9 +56,8 @@ resource "aws_subnet" "private_subnets" {
 
 # Route Table pública
 resource "aws_route_table" "public" {
-  count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
-
-  vpc_id = aws_vpc.ez_fastfood_vpc.id
+  for_each = length(aws_vpc.ez_fastfood_vpc) > 0 ? { "public" = true } : {}
+  vpc_id = aws_vpc.ez_fastfood_vpc[0].id
 
   tags = {
     Name        = "${var.project}-public-rt-${var.environment}"
@@ -71,9 +68,9 @@ resource "aws_route_table" "public" {
 
 # Route Table Privada
 resource "aws_route_table" "private" {
- count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
+ for_each = length(aws_vpc.ez_fastfood_vpc) > 0 ? { "private" = true } : {}
 
-  vpc_id = aws_vpc.ez_fastfood_vpc.id
+  vpc_id = aws_vpc.ez_fastfood_vpc[0].id
 
   tags = {
     Name        = "${var.project}-private-rt-${var.environment}"
@@ -84,8 +81,8 @@ resource "aws_route_table" "private" {
 
 # Associar a Route Table às Subnets Públicas
 resource "aws_route_table_association" "public" {
-  count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
-  for_each = aws_subnet.public_subnets
+  for_each = length(aws_vpc.ez_fastfood_vpc) > 0 ? aws_subnet.public_subnets : {}
+  #for_each = aws_subnet.public_subnets
 
   subnet_id      = each.value.id
   route_table_id = aws_route_table.public.id
@@ -93,8 +90,8 @@ resource "aws_route_table_association" "public" {
 
 # Associar a Route Table às Subnets Privadas
 resource "aws_route_table_association" "private" {
-  count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
-  for_each = aws_subnet.private_subnets
+for_each = length(aws_vpc.ez_fastfood_vpc) > 0 ? aws_subnet.private_subnets : {}
+  #for_each = aws_subnet.private_subnets
 
   subnet_id      = each.value.id
   route_table_id = aws_route_table.private.id

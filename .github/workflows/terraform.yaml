@@ -27,6 +27,9 @@ jobs:
       - name: Terraform Init (VPC)
         run: terraform init
 
+      - name: Terraform Validate (VPC)
+        run: terraform validate
+
       - name: Terraform Plan (VPC)
         run: terraform plan -target=module.vpc -out=${{ env.PLAN_VPC }}
 
