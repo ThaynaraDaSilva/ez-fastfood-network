@@ -1,7 +1,16 @@
 # main.tf
 
+# Buscar VPC existente com a tag Name específica
+data "aws_vpc" "selected" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.project}-vpc-${var.environment}"]
+  }
+}
+
 # Criar a VPC
 resource "aws_vpc" "ez_fastfood_vpc" {
+  count = length(data.aws_vpc.selected.id) == 0 ? 1 : 0 # condição para não criar recurso quando já existir.
   cidr_block = var.cidr_block
   enable_dns_support   = true # adicionado devido ao BD estar exposto 
   enable_dns_hostnames = true # adicionado devido ao BD estar exposto 
@@ -14,6 +23,8 @@ resource "aws_vpc" "ez_fastfood_vpc" {
 }
 # Criar Subnets
 resource "aws_subnet" "public_subnets" {
+  count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
+  
   for_each = var.public_subnets
 
   vpc_id                  = aws_vpc.ez_fastfood_vpc.id
@@ -30,6 +41,7 @@ resource "aws_subnet" "public_subnets" {
 
 # Subnets Privadas
 resource "aws_subnet" "private_subnets" {
+  count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
   for_each = var.private_subnets
 
   vpc_id                  = aws_vpc.ez_fastfood_vpc.id
@@ -46,6 +58,8 @@ resource "aws_subnet" "private_subnets" {
 
 # Route Table pública
 resource "aws_route_table" "public" {
+  count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
+
   vpc_id = aws_vpc.ez_fastfood_vpc.id
 
   tags = {
@@ -57,6 +71,8 @@ resource "aws_route_table" "public" {
 
 # Route Table Privada
 resource "aws_route_table" "private" {
+ count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
+
   vpc_id = aws_vpc.ez_fastfood_vpc.id
 
   tags = {
@@ -68,6 +84,7 @@ resource "aws_route_table" "private" {
 
 # Associar a Route Table às Subnets Públicas
 resource "aws_route_table_association" "public" {
+  count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
   for_each = aws_subnet.public_subnets
 
   subnet_id      = each.value.id
@@ -76,6 +93,7 @@ resource "aws_route_table_association" "public" {
 
 # Associar a Route Table às Subnets Privadas
 resource "aws_route_table_association" "private" {
+  count = length(aws_vpc.ez_fastfood_vpc) > 0 ? 1 : 0
   for_each = aws_subnet.private_subnets
 
   subnet_id      = each.value.id

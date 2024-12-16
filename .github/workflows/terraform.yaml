@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - feature/pipeline
+      - hotfix/resources-duplication
 
 env:
   TF_VAR_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
