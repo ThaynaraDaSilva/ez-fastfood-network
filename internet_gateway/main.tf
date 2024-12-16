@@ -17,14 +17,19 @@ data "aws_subnet" "public_subnets" {
   }
 
   filter {
-    name   = "tag:Type"
-    values = ["public"]
+    name   = "tag:Name"
+    values = ["${var.project}-public-subnet-${var.environment}"]
   }
 }
 
 data "aws_subnet" "public_subnets_detail" {
   for_each = toset(data.aws_subnet.public_subnets.id)
   id       = each.value
+
+  filter {
+    name   = "tag:Name"
+    values = ["${var.project}-public-subnet-${var.environment}"]
+  }
 }
 
 # Buscar a route table pública associada à VPC
@@ -34,9 +39,9 @@ data "aws_route_table" "public_route_table" {
     values = [data.aws_vpc.selected.id]
   }
 
-  filter {
-    name   = "tag:Type"
-    values = ["public"]
+ filter {
+    name   = "tag:Name"
+    values = ["${var.project}-public-rt-${var.environment}"]
   }
 
 
