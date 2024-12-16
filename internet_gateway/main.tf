@@ -18,7 +18,7 @@ data "aws_subnet" "public_subnets" {
 
   filter {
     name   = "tag:Name"
-    values = ["${var.project}-public-subnet-${var.environment}"]
+    values = ["ez-fastfood-private-subnet1", "ez-fastfood-private-subnet2"]
   }
 }
 
@@ -28,7 +28,7 @@ data "aws_subnet" "public_subnets_detail" {
 
   filter {
     name   = "tag:Name"
-    values = ["${var.project}-public-subnet-${var.environment}"]
+    values = ["ez-fastfood-private-subnet1", "ez-fastfood-private-subnet2"]
   }
 }
 
