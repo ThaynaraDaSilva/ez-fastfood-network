@@ -16,36 +16,13 @@ env:
   PLAN_SG: "tfplan-sg"
 
 jobs:
-  # # 1. Initialize Terraform (Global)
-  # initialize:
-  #   name: "Initialize Terraform"
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Code
-  #       uses: actions/checkout@v3
-
-  #     - name: Set up Terraform
-  #       uses: hashicorp/setup-terraform@v2
-  #       with:
-  #         terraform_version: "1.6.0"
-
-  #     - name: Terraform Init (Global)
-  #       run: terraform init
-
-  #     - name: Save Terraform Init State
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: terraform-init
-  #         path: .terraform
-
-  # 2. VPC Module
+  # VPC Module
   vpc:
     name: "VPC Module"
-    #needs: initialize  # Dependência do job de inicialização
     runs-on: ubuntu-latest
     steps:
-      #- name: Checkout Code
-      #  uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Terraform Init (VPC)
         run: terraform init
@@ -53,17 +30,29 @@ jobs:
       - name: Terraform Plan (VPC)
         run: terraform plan -target=module.vpc -out=${{ env.PLAN_VPC }}
 
+      - name: Save Terraform Plan (VPC)
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.PLAN_VPC }}
+          path: .
+          
       - name: Terraform Apply (VPC)
         run: terraform apply -auto-approve ${{ env.PLAN_VPC }}
 
-  # 3. Internet Gateway Module
+  # Internet Gateway Module
   internet-gateway:
     name: "Internet Gateway Module"
     needs: vpc
     runs-on: ubuntu-latest
     steps:
-      #- name: Checkout Code
-      #  uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Download Terraform Plan (VPC)
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.PLAN_VPC }}
+          path: .
 
       - name: Terraform Init (IGW)
         run: terraform init
@@ -71,17 +60,29 @@ jobs:
       - name: Terraform Plan (IGW)
         run: terraform plan -target=module.internet_gateway -out=${{ env.PLAN_IGW }}
 
+      - name: Save Terraform Plan (IGW)
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.PLAN_IGW }}
+          path: .
+          
       - name: Terraform Apply (IGW)
         run: terraform apply -auto-approve ${{ env.PLAN_IGW }}
 
-  # 4. Security Group Module
+  # Security Group Module
   security-group:
     name: "Security Group Module"
     needs: vpc
     runs-on: ubuntu-latest
     steps:
-      #- name: Checkout Code
-      #  uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Download Terraform Plan (VPC)
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.PLAN_VPC }}
+          path: .
 
       - name: Terraform Init (SG)
         run: terraform init
@@ -89,29 +90,47 @@ jobs:
       - name: Terraform Plan (SG)
         run: terraform plan -target=module.security_group -out=${{ env.PLAN_SG }}
 
+      - name: Save Terraform Plan (SG)
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.PLAN_SG }}
+          path: .
+          
       - name: Terraform Apply (SG)
         run: terraform apply -auto-approve ${{ env.PLAN_SG }}
 
-  # 5. Final Outputs
+  # Collect Outputs
   outputs:
     name: "Collect Outputs"
     needs: [vpc, internet-gateway, security-group]
     runs-on: ubuntu-latest
     steps:
-      #- name: Checkout Code
-      #  uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Terraform Output
         run: terraform output
 
-  # 6. Cleanup Job in case of failure
+  # Cleanup on Failure
   cleanup:
     name: "Terraform Destroy on Failure"
     if: failure()  # Executa apenas se algum job falhar
     runs-on: ubuntu-latest
     steps:
-      #- name: Checkout Code
-      #  uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Terraform Destroy All
+      - name: Download All Terraform Plans
+        uses: actions/download-artifact@v3
+        with:
+          name: "*"
+          path: .
+
+      - name: Terraform Destroy Security Group
+        run: terraform destroy -auto-approve -target=module.security_group
+
+      - name: Terraform Destroy Internet Gateway
+        run: terraform destroy -auto-approve -target=module.internet_gateway
+
+      - name: Terraform Destroy VPC
         run: terraform destroy -auto-approve
