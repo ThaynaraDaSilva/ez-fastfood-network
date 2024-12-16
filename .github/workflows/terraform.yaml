@@ -48,13 +48,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Baixar o estado da VPC
-      - name: Download Terraform State (VPC)
-        uses: actions/download-artifact@v3
-        with:
-          name: artifacts-vpc
-          path: .
-
       - name: Terraform Init (IGW)
         run: terraform init
 
@@ -78,13 +71,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-
-      # Baixar o estado do IGW
-      - name: Download Terraform State (IGW)
-        uses: actions/download-artifact@v3
-        with:
-          name: artifacts-igw
-          path: .
 
       - name: Terraform Init (SG)
         run: terraform init

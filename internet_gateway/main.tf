@@ -10,7 +10,7 @@ data "aws_vpc" "selected" {
 }
 
 # Buscar as subnets públicas associadas à VPC
-data "aws_subnet_ids" "public_subnets" {
+data "aws_subnet" "public_subnets" {
   vpc_id = data.aws_vpc.selected.id
 }
 
