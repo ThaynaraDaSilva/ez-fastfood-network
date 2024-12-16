@@ -10,7 +10,7 @@ data "aws_vpc" "selected" {
 }
 
 # Buscar IDs das subnets públicas associadas à VPC
-data "aws_subnet" "public_subnets" {
+data "aws_subnet_ids" "public_subnets" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.selected.id]
@@ -23,13 +23,13 @@ data "aws_subnet" "public_subnets" {
 }
 
 data "aws_subnet" "public_subnets_detail" {
-  for_each = toset(data.aws_subnet.public_subnets.id)
+  for_each = toset(data.aws_subnet_ids.public_subnets.ids)
   id       = each.value
 
-  filter {
-    name   = "tag:Name"
-    values = ["ez-fastfood-private-subnet1", "ez-fastfood-private-subnet2"]
-  }
+  # filter {
+  #   name   = "tag:Name"
+  #   values = ["ez-fastfood-private-subnet1", "ez-fastfood-private-subnet2"]
+  # }
 }
 
 # Buscar a route table pública associada à VPC
@@ -67,7 +67,7 @@ resource "aws_route" "public_default_route" {
 
 # Associar a Route Table com as Subnets Públicas
 resource "aws_route_table_association" "public_subnet_association" {
-  for_each = toset(data.aws_subnet.public_subnets.id)
+  for_each = toset(data.aws_subnet_ids.public_subnets.ids)
 
   subnet_id      = each.value
   route_table_id = data.aws_route_table.public_route_table.id
