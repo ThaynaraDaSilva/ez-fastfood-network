@@ -1,7 +1,15 @@
 # main.tf
+
+# Buscar a VPC existente pelo nome ou tag
+data "aws_vpc" "selected" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.project}-vpc-${var.environment}"] # Nome padrão da VPC
+  }
+}
 # Criar o Internet Gateway
 resource "aws_internet_gateway" "igw" {
-  vpc_id = var.vpc_id
+  vpc_id = data.aws_vpc.selected.id
 
   tags = {
     Name        = "${var.project}-igw-${var.environment}"

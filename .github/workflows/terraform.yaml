@@ -41,7 +41,7 @@ jobs:
 
   # Internet Gateway Module
   internet-gateway:
-    name: "Internet Gateway Module"
+    name: "IGW Module"
     needs: vpc
     runs-on: ubuntu-latest
     steps:
@@ -72,7 +72,7 @@ jobs:
 
   # Security Group Module
   security-group:
-    name: "Security Group Module"
+    name: "SG Module"
     needs: internet-gateway
     runs-on: ubuntu-latest
     steps:

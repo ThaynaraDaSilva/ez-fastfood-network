@@ -1,8 +1,3 @@
-variable "vpc_id" {
-  description = "ID da VPC onde o Security Group será criado"
-  type        = string
-}
-
 variable "ingress_rules" {
   description = "Regras dinâmicas de ingress para o Security Group"
   type = list(object({

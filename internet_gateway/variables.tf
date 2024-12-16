@@ -1,8 +1,3 @@
-variable "vpc_id" {
-  description = "ID da VPC onde o Internet Gateway será criado"
-  type        = string
-}
-
 variable "public_route_table_id" {
   description = "ID da Route Table pública criada no módulo VPC"
   type        = string
