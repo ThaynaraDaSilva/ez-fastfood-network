@@ -1,6 +1,4 @@
-provider "aws" {
-  region = var.region
-}
+# main.tf
 
 module "vpc" {
   source      = "./vpc"
@@ -16,7 +14,6 @@ module "vpc" {
 # Módulo Security Group
 module "security_group" {
   source        = "./security_group"
-  vpc_id        = module.vpc.vpc_id    # Referência ao módulo VPC
   ingress_rules = var.ingress_rules    # Variáveis dinâmicas
   egress_rules  = var.egress_rules
   project       = var.project
@@ -27,27 +24,24 @@ module "security_group" {
 # Módulo Internet Gateway
 module "internet_gateway" {
   source            = "./internet_gateway"
-  vpc_id            = module.vpc.vpc_id
-  public_subnet_ids = module.vpc.public_subnet_ids
-  public_route_table_id = module.vpc.public_route_table_id
   project           = var.project
   environment       = var.environment
 }
 
-# Outputs
-output "public_route_table_id" {
-  description = "ID da Route Table pública"
-  value       = module.internet_gateway.public_route_table_id
-}
+# # Outputs
+# output "public_route_table_id" {
+#   description = "ID da Route Table pública"
+#   value       = module.internet_gateway.public_route_table_id
+# }
 
-output "rds_security_group_id" {
-  description = "ID do Security Group do RDS"
-  value       = module.security_group.rds_security_group_id
-}
+# output "rds_security_group_id" {
+#   description = "ID do Security Group do RDS"
+#   value       = module.security_group.rds_security_group_id
+# }
 
-output "internet_gateway_id" {
-  description = "ID do Internet Gateway"
-  value       = module.internet_gateway.internet_gateway_id
-}
+# output "internet_gateway_id" {
+#   description = "ID do Internet Gateway"
+#   value       = module.internet_gateway.internet_gateway_id
+# }
 
 

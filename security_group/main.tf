@@ -1,12 +1,17 @@
-# main.tf
+# Buscar a VPC existente pelo nome ou tag
+data "aws_vpc" "selected" {
+  filter {
+    name   = "tag:Name"
+    values = ["${var.project}-vpc-${var.environment}"] # Nome padrão da VPC
+  }
+
+}
 
 # Criar Security Group dinâmico
 resource "aws_security_group" "rds_sg" {
   name        = "${var.project}-rds-sg-${var.environment}"
   description = "${var.project} rds sg"
-  vpc_id      = var.vpc_id
-
-
+  vpc_id      = data.aws_vpc.selected.id
 
   # Regras de ingress dinâmicas
   dynamic "ingress" {

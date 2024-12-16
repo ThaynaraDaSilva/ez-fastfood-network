@@ -23,7 +23,7 @@ private_subnets = {
 }
 
 
-allowed_ips = ["177.190.77.161/32"]  # Seu IP para acesso ao PostgreSQL
+#allowed_ips = ["177.190.77.161/32"]  # Seu IP para acesso ao PostgreSQL
 
 # Regras de ingress
 ingress_rules = [

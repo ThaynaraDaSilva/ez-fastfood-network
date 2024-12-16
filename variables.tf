@@ -1,6 +1,27 @@
 variable "region" {
-  default = "us-east-1"
+  description = "AWS Region"
+  type        = string
+  default     = "us-east-1"
 }
+
+variable "access_key" {
+  description = "AWS Access Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "secret_key" {
+  description = "AWS Secret Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "project" {
+  description = "Project name for tagging"
+  type        = string
+  default     = "ez-fastfood"
+}
+
 
 variable "cidr_block" {
   default = "10.0.0.0/16"
@@ -10,9 +31,6 @@ variable "environment" {
   default = "dev"
 }
 
-variable "project" {
-  default = "ez-fastfood"
-}
 
 variable "vpc_name" {
   default = "ez-fastfood-dev-vpc"
@@ -35,11 +53,11 @@ variable "private_subnets" {
 }
 
 # IPs Permitidos para o PostgreSQL (Security Group)
-variable "allowed_ips" {
-  description = "Liberação de IP para acesso a instancia"
-  type        = list(string)
-  default     = ["177.190.77.161/32"] # Substitua pelo seu IP
-}
+# variable "allowed_ips" {
+#   description = "Liberação de IP para acesso a instancia"
+#   type        = list(string)
+#   default     = ["177.190.77.161/32"] # Substitua pelo seu IP
+# }
 
 variable "ingress_rules" {
   description = "Regras dinâmicas de ingress para o Security Group"
