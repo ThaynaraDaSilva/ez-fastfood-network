@@ -28,20 +28,20 @@ module "internet_gateway" {
   environment       = var.environment
 }
 
-# Outputs
-output "public_route_table_id" {
-  description = "ID da Route Table pública"
-  value       = module.internet_gateway.public_route_table_id
-}
+# # Outputs
+# output "public_route_table_id" {
+#   description = "ID da Route Table pública"
+#   value       = module.internet_gateway.public_route_table_id
+# }
 
-output "rds_security_group_id" {
-  description = "ID do Security Group do RDS"
-  value       = module.security_group.rds_security_group_id
-}
+# output "rds_security_group_id" {
+#   description = "ID do Security Group do RDS"
+#   value       = module.security_group.rds_security_group_id
+# }
 
-output "internet_gateway_id" {
-  description = "ID do Internet Gateway"
-  value       = module.internet_gateway.internet_gateway_id
-}
+# output "internet_gateway_id" {
+#   description = "ID do Internet Gateway"
+#   value       = module.internet_gateway.internet_gateway_id
+# }
 
 
