@@ -85,7 +85,7 @@ resource "aws_route_table_association" "public" {
   #for_each = aws_subnet.public_subnets
 
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.public.id
+  route_table_id = aws_route_table.public["public"].id
 }
 
 # Associar a Route Table às Subnets Privadas
@@ -94,7 +94,7 @@ for_each = length(aws_vpc.ez_fastfood_vpc) > 0 ? aws_subnet.private_subnets : {}
   #for_each = aws_subnet.private_subnets
 
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.private.id
+  route_table_id = aws_route_table.private["private"].id
 }
 
 
