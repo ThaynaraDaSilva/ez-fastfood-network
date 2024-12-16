@@ -18,7 +18,7 @@ data "aws_subnet" "public_subnets" {
 
   filter {
     name   = "tag:Name"
-    values = ["ez-fastfood-private-subnet1", "ez-fastfood-private-subnet2"]
+    values = ["ez-fastfood-public-subnet1", "ez-fastfood-public-subnet2"]
   }
 }
 
