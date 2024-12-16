@@ -30,12 +30,12 @@ jobs:
       - name: Terraform Plan (VPC)
         run: terraform plan -target=module.vpc -out=${{ env.PLAN_VPC }}
 
-      - name: Save Terraform Plan (VPC)
+      - name: Save Terraform Artifacts (VPC)
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PLAN_VPC }}
+          name: artifacts-vpc
           path: .
-          
+
       - name: Terraform Apply (VPC)
         run: terraform apply -auto-approve ${{ env.PLAN_VPC }}
 
@@ -48,24 +48,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Download Terraform Plan (VPC)
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ env.PLAN_VPC }}
-          path: .
-
       - name: Terraform Init (IGW)
         run: terraform init
 
       - name: Terraform Plan (IGW)
         run: terraform plan -target=module.internet_gateway -out=${{ env.PLAN_IGW }}
 
-      - name: Save Terraform Plan (IGW)
+      - name: Save Terraform Artifacts (IGW)
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PLAN_IGW }}
+          name: artifacts-igw
           path: .
-          
+
       - name: Terraform Apply (IGW)
         run: terraform apply -auto-approve ${{ env.PLAN_IGW }}
 
@@ -78,59 +72,47 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Download Terraform Plan (VPC)
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ env.PLAN_VPC }}
-          path: .
-
       - name: Terraform Init (SG)
         run: terraform init
 
       - name: Terraform Plan (SG)
         run: terraform plan -target=module.security_group -out=${{ env.PLAN_SG }}
 
-      - name: Save Terraform Plan (SG)
+      - name: Save Terraform Artifacts (SG)
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PLAN_SG }}
+          name: artifacts-sg
           path: .
-          
+
       - name: Terraform Apply (SG)
         run: terraform apply -auto-approve ${{ env.PLAN_SG }}
-
-  # Collect Outputs
-  outputs:
-    name: "Collect Outputs"
-    needs: [vpc, internet-gateway, security-group]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Terraform Output
-        run: terraform output
 
   # Cleanup on Failure
   cleanup:
     name: "Terraform Destroy on Failure"
     if: failure()  # Executa apenas se algum job falhar
+    needs: [vpc, internet-gateway, security-group]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Download All Terraform Plans
+      # Baixar todos os artefatos de uma só vez
+      - name: Download All Terraform Artifacts
         uses: actions/download-artifact@v3
         with:
           name: "*"
           path: .
 
+      # Destruir recursos relacionados aos Security Groups
       - name: Terraform Destroy Security Group
-        run: terraform destroy -auto-approve -target=module.security_group
+        run: cd artifacts-sg && terraform destroy -auto-approve -target=module.security_group
 
+      # Destruir recursos relacionados ao Internet Gateway
       - name: Terraform Destroy Internet Gateway
-        run: terraform destroy -auto-approve -target=module.internet_gateway
+        run: cd artifacts-igw && terraform destroy -auto-approve -target=module.internet_gateway
 
+      # Destruir a VPC
       - name: Terraform Destroy VPC
-        run: terraform destroy -auto-approve
+        run: cd artifacts-vpc && terraform destroy -auto-approve -target=module.vpc
