@@ -16,8 +16,10 @@ env:
   PLAN_SG: "tfplan-sg"
 
 jobs:
+  
   # VPC Module
   vpc:
+    if: github.event.pull_request.merged == true
     name: "VPC Module"
     runs-on: ubuntu-latest
     steps:
